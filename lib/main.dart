@@ -1,16 +1,35 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:open_settings/open_settings.dart';
 
 import 'package:twit_clone/colors.dart';
+import 'package:twit_clone/firebase_options.dart';
+import 'package:twit_clone/services/internet_service/bloc/internet_bloc.dart';
 import 'package:twit_clone/views/acc_view.dart';
 import 'package:twit_clone/views/fav_view.dart';
 import 'package:twit_clone/views/home_view.dart';
 import 'package:twit_clone/views/search_view.dart';
 import 'package:twit_clone/widgets/glowing_action_button.dart';
+import 'package:twit_clone/widgets/helpers.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => InternetBloc(),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -52,6 +71,10 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
     pageIndex.value = index;
   }
 
+  void openInternetSettings() async {
+    OpenSettings.openNetworkOperatorSetting();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,10 +96,48 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
           IconButton(icon: const Icon(Icons.person_outlined), onPressed: () {}),
         ],
       ),
-      body: ValueListenableBuilder(
-        valueListenable: pageIndex,
-        builder: (context, value, child) {
-          return pages[value];
+      body: BlocBuilder<InternetBloc, InternetState>(
+        builder: (context, state) {
+          if (state is NotConnectedState) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.wifi_off,
+                    size: 60,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  const Text(
+                    'Internet is off please turn on clicking below button',
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  ElevatedButton(
+                    onPressed: openInternetSettings,
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.black),
+                    child: const Text(
+                      'turn on internet',
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            );
+          }
+
+          return ValueListenableBuilder(
+            valueListenable: pageIndex,
+            builder: (context, value, child) {
+              return pages[value];
+            },
+          );
         },
       ),
       bottomNavigationBar:
