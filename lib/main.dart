@@ -7,13 +7,19 @@ import 'package:open_settings/open_settings.dart';
 
 import 'package:twit_clone/colors.dart';
 import 'package:twit_clone/firebase_options.dart';
+import 'package:twit_clone/repositories/auth_repo.dart';
+import 'package:twit_clone/services/auth/bloc/auth_bloc.dart';
 import 'package:twit_clone/services/internet_service/bloc/internet_bloc.dart';
 import 'package:twit_clone/views/acc_view.dart';
 import 'package:twit_clone/views/fav_view.dart';
 import 'package:twit_clone/views/home_view.dart';
+import 'package:twit_clone/views/landing_screen.dart';
 import 'package:twit_clone/views/search_view.dart';
 import 'package:twit_clone/widgets/glowing_action_button.dart';
-import 'package:twit_clone/widgets/helpers.dart';
+
+//Todo
+//add user details gathering screen and update users auth profile
+//commit changes to firestore
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,13 +27,26 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(
-    MultiBlocProvider(
+    MultiRepositoryProvider(
       providers: [
-        BlocProvider(
-          create: (context) => InternetBloc(),
+        RepositoryProvider(
+          create: (_) => AuthRepository(),
         ),
       ],
-      child: const MyApp(),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => InternetBloc(),
+          ),
+          BlocProvider(
+            create: (context) => AuthBloc(
+              authRepository: RepositoryProvider.of<AuthRepository>(context),
+              context: context,
+            ),
+          ),
+        ],
+        child: const MyApp(),
+      ),
     ),
   );
 }
@@ -38,19 +57,28 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: primaryColor),
-        useMaterial3: true,
-        textTheme: GoogleFonts.latoTextTheme(),
-      ),
-      home: const MyHomeScreen(),
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        return MaterialApp(
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: primaryColor),
+            useMaterial3: true,
+            textTheme: GoogleFonts.latoTextTheme(),
+          ),
+          home: state is AuthenticatedState
+              ? const MyHomeScreen()
+              : const LandingScreen(),
+        );
+      },
     );
   }
 }
 
 class MyHomeScreen extends StatefulWidget {
+  static Route getRoute() => MaterialPageRoute(
+        builder: (context) => const MyHomeScreen(),
+      );
   const MyHomeScreen({super.key});
 
   @override

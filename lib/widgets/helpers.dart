@@ -12,3 +12,25 @@ void showSnackbar({
     ),
   );
 }
+
+ElevatedButton customButton({
+  required BuildContext context,
+  required Widget child,
+  required Color color,
+  required VoidCallback onPressed,
+}) {
+  return ElevatedButton(
+    onPressed: onPressed,
+    style: ElevatedButton.styleFrom(
+      backgroundColor: color,
+      minimumSize: const Size(double.infinity, 50),
+    ),
+    child: child,
+  );
+}
+
+Widget customLoaoder(BuildContext context) {
+  return const Center(
+    child: CircularProgressIndicator(),
+  );
+}
