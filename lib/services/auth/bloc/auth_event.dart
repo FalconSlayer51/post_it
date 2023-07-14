@@ -40,3 +40,13 @@ class OnUserNotSignedIn extends AuthEvent {
   @override
   List<Object> get props => [];
 }
+
+class OnUserVerified extends AuthEvent {
+  @override
+  List<Object> get props =>[];
+}
+
+class OnUserNotVerified extends AuthEvent {
+  @override
+  List<Object> get props =>[];
+}

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +19,8 @@ abstract class IAuthRepo {
   });
 
   Future<void> logOut();
+
+  Future<void> sendEmailVerification();
 }
 
 class AuthRepository implements IAuthRepo {
@@ -62,5 +66,14 @@ class AuthRepository implements IAuthRepo {
       
       throw Exception(e.toString());
     });
+  }
+
+  @override
+  Future<void> sendEmailVerification() async {
+    try{
+      await auth.currentUser!.sendEmailVerification();
+    }catch(e){
+      log(e.toString());
+    }
   }
 }

@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,17 +12,30 @@ import 'package:twit_clone/colors.dart';
 import 'package:twit_clone/firebase_options.dart';
 import 'package:twit_clone/repositories/auth_repo.dart';
 import 'package:twit_clone/services/auth/bloc/auth_bloc.dart';
+import 'package:twit_clone/services/auth/bloc/emil_verification_bloc.dart';
 import 'package:twit_clone/services/internet_service/bloc/internet_bloc.dart';
 import 'package:twit_clone/views/acc_view.dart';
+import 'package:twit_clone/views/email_verification_screen.dart';
 import 'package:twit_clone/views/fav_view.dart';
 import 'package:twit_clone/views/home_view.dart';
 import 'package:twit_clone/views/landing_screen.dart';
 import 'package:twit_clone/views/search_view.dart';
 import 'package:twit_clone/widgets/glowing_action_button.dart';
+import 'package:twit_clone/widgets/helpers.dart';
+import 'package:twit_clone/services/auth/bloc/emil_verification_bloc.dart';
 
 //Todo
 //add user details gathering screen and update users auth profile
 //commit changes to firestore
+
+Widget renderScreensToAuthChanges(AuthState state) {
+  if (state is AuthenticatedState) {
+    return const MyHomeScreen();
+  }else {
+    return const LandingScreen();
+  }
+}
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,10 +55,15 @@ Future<void> main() async {
             create: (context) => InternetBloc(),
           ),
           BlocProvider(
-            create: (context) => AuthBloc(
-              authRepository: RepositoryProvider.of<AuthRepository>(context),
-              context: context,
-            ),
+            create: (context) =>
+                AuthBloc(
+                  authRepository: RepositoryProvider.of<AuthRepository>(
+                      context),
+                  context: context,
+                ),
+          ),
+          BlocProvider(
+            create: (context) => EmilVerificationBloc(),
           ),
         ],
         child: const MyApp(),
@@ -58,17 +79,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
-      builder: (context, state) {
+      builder: (context, AuthState state) {
         return MaterialApp(
-          title: 'Flutter Demo',
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: primaryColor),
-            useMaterial3: true,
-            textTheme: GoogleFonts.latoTextTheme(),
-          ),
-          home: state is AuthenticatedState
-              ? const MyHomeScreen()
-              : const LandingScreen(),
+            title: 'Flutter Demo',
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: primaryColor),
+              useMaterial3: true,
+              textTheme: GoogleFonts.latoTextTheme(),
+            ),
+            home: renderScreensToAuthChanges(state)
         );
       },
     );
@@ -76,9 +95,11 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomeScreen extends StatefulWidget {
-  static Route getRoute() => MaterialPageRoute(
+  static Route getRoute() =>
+      MaterialPageRoute(
         builder: (context) => const MyHomeScreen(),
       );
+
   const MyHomeScreen({super.key});
 
   @override
@@ -124,52 +145,64 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
           IconButton(icon: const Icon(Icons.person_outlined), onPressed: () {}),
         ],
       ),
-      body: BlocBuilder<InternetBloc, InternetState>(
-        builder: (context, state) {
-          if (state is NotConnectedState) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.wifi_off,
-                    size: 60,
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  const Text(
-                    'Internet is off please turn on clicking below button',
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  ElevatedButton(
-                    onPressed: openInternetSettings,
-                    style:
-                        ElevatedButton.styleFrom(backgroundColor: Colors.black),
-                    child: const Text(
-                      'turn on internet',
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            );
-          }
 
-          return ValueListenableBuilder(
-            valueListenable: pageIndex,
-            builder: (context, value, child) {
-              return pages[value];
+      body: BlocListener<EmilVerificationBloc, EmilVerificationState>(
+    listener: (context, state){
+      if(state is EmailNotVerifiedState){
+        Navigator.push(
+          context,
+          EmailVerificationSceeen.getRoute(authRepository: RepositoryProvider.of<AuthRepository>(context),),
+        );
+      }
+    }
+    ,
+          child: BlocBuilder<InternetBloc, InternetState>(
+            builder: (context, state) {
+              if (state is NotConnectedState) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.wifi_off,
+                        size: 60,
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      const Text(
+                        'Internet is off please turn on clicking below button',
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      ElevatedButton(
+                        onPressed: openInternetSettings,
+                        style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.black),
+                        child: const Text(
+                          'turn on internet',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                );
+              }
+
+              return ValueListenableBuilder(
+                valueListenable: pageIndex,
+                builder: (context, value, child) {
+                  return pages[value];
+                },
+              );
             },
-          );
-        },
+          )
       ),
       bottomNavigationBar:
-          _BottomNavBar(onItemSelected: _onNavigationItemSelected),
+      _BottomNavBar(onItemSelected: _onNavigationItemSelected),
     );
   }
 }
@@ -300,9 +333,9 @@ class _NavigationBarItem extends StatelessWidget {
               lable,
               style: isSelected
                   ? const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                    )
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+              )
                   : const TextStyle(fontSize: 11),
             ),
           ],

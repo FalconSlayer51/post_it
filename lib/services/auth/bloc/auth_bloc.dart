@@ -25,6 +25,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthenticatedState());
     });
 
+    on<OnUserVerified>((event, emit) {
+      emit(UserVerifiedState());
+    });
+
+    on<OnUserNotVerified>((event, emit) {
+      emit(UserNotVerifiedState());
+    });
+
     FirebaseAuth.instance.authStateChanges().listen((event) {
       if (event!.uid.isNotEmpty) {
         add(OnUserSignedIn());

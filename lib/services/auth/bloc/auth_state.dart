@@ -32,3 +32,14 @@ class AuthenticatedState extends AuthState {
   @override
   List<Object> get props => [];
 }
+
+class UserVerifiedState extends AuthState {
+  @override
+  List<Object> get props => [];
+}
+
+class UserNotVerifiedState extends AuthState {
+  @override
+  List<Object> get props => [];
+}
+

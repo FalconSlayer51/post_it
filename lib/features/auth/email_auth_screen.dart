@@ -5,12 +5,17 @@ import 'package:twit_clone/repositories/auth_repo.dart';
 import 'package:twit_clone/services/auth/bloc/auth_bloc.dart';
 import 'package:twit_clone/widgets/helpers.dart';
 
-class EmailAuthScreen extends StatelessWidget {
+class EmailAuthScreen extends StatefulWidget {
   static Route getRoute() => MaterialPageRoute(
         builder: (context) => const EmailAuthScreen(),
       );
   const EmailAuthScreen({super.key});
 
+  @override
+  State<EmailAuthScreen> createState() => _EmailAuthScreenState();
+}
+
+class _EmailAuthScreenState extends State<EmailAuthScreen> {
   void signUp(BuildContext context, String email, String password) {
     BlocProvider.of<AuthBloc>(context).add(
       OnSignUpRequested(email: email, password: password),
@@ -32,11 +37,11 @@ class EmailAuthScreen extends StatelessWidget {
           );
           return;
         }
-        if (state is AuthenticatedState) {
+         if (state is AuthenticatedState) {
           Navigator.pushAndRemoveUntil(
             context,
             MyHomeScreen.getRoute(),
-            (route) => false,
+              (_)=> false
           );
         }
       },

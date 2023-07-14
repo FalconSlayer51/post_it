@@ -50,7 +50,7 @@ class LandingScreen extends StatelessWidget {
                 color: Colors.black,
                 context: context,
                 onPressed: () {
-                  Navigator.push(context, EmailAuthScreen.getRoute());
+                  Navigator.pushAndRemoveUntil(context, EmailAuthScreen.getRoute(),(_)=>false);
                 },
               ),
               const SizedBox(
