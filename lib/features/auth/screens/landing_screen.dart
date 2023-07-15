@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:twit_clone/features/auth/bloc/auth_bloc.dart';
 import 'package:twit_clone/features/auth/screens/email_auth_screen.dart';
 
+import '../../../main.dart';
 import '../../../widgets/helpers.dart';
 
 class LandingScreen extends StatefulWidget {
@@ -21,7 +22,21 @@ class LandingScreen extends StatefulWidget {
 class _LandingScreenState extends State<LandingScreen> {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthBloc, AuthState>(
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is LoginFailedState) {
+          showSnackbar(
+            context: context,
+            color: Colors.red,
+            text: state.errorMessage,
+          );
+          return;
+        }
+        if (state is AuthenticatedState) {
+          Navigator.pushAndRemoveUntil(
+              context, MyHomeScreen.getRoute(), (_) => false);
+        }
+      },
       builder: (context, state) {
         return Scaffold(
           body: SingleChildScrollView(

@@ -43,3 +43,15 @@ class UserNotVerifiedState extends AuthState {
   List<Object> get props => [];
 }
 
+class LoginFailedState extends AuthState {
+
+  final String errorMessage;
+  
+  const LoginFailedState({
+    required this.errorMessage,
+  });
+   @override
+  List<Object> get props => [];
+}
+
+

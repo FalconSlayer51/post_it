@@ -1,13 +1,14 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:meta/meta.dart';
+import 'package:twit_clone/features/auth/bloc/auth_bloc.dart';
 part 'emil_verification_event.dart';
 part 'emil_verification_state.dart';
 
-class EmilVerificationBloc extends Bloc<EmilVerificationEvent, EmilVerificationState> {
+class EmilVerificationBloc
+    extends Bloc<EmilVerificationEvent, EmilVerificationState> {
   final auth = FirebaseAuth.instance;
   StreamSubscription? subscription;
   EmilVerificationBloc() : super(EmilVerificationInitial()) {
@@ -19,13 +20,13 @@ class EmilVerificationBloc extends Bloc<EmilVerificationEvent, EmilVerificationS
     });
 
     subscription = auth.authStateChanges().listen((event) {
-      log(event!.emailVerified.toString());
-      if(event.emailVerified){
+
+
+      if (event!.emailVerified) {
         add(OnEmailVerified());
-      }else{
+      } else {
         add(OnEmailNotVerified());
       }
     });
-
   }
 }

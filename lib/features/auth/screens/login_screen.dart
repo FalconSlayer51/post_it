@@ -13,7 +13,7 @@ class LoginScreen extends StatelessWidget {
         builder: (context) => const LoginScreen(),
       );
 
-  void signIn(BuildContext context, String email, String password)  {
+  void signIn(BuildContext context, String email, String password) {
     BlocProvider.of<AuthBloc>(context).add(
       OnLoginRequested(email: email, password: password),
     );
@@ -25,7 +25,7 @@ class LoginScreen extends StatelessWidget {
     final passwordController = TextEditingController();
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
-        if (state is AuthFailedState) {
+        if (state is LoginFailedState) {
           showSnackbar(
             context: context,
             color: Colors.red,
@@ -122,7 +122,8 @@ class LoginScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   onTap: () {
-                    Navigator.pushReplacement(context, EmailAuthScreen.getRoute());
+                    Navigator.pushReplacement(
+                        context, EmailAuthScreen.getRoute());
                   },
                 ),
               ],

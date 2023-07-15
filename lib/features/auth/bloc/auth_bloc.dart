@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:twit_clone/features/auth/repositories/auth_repo.dart';
 import 'dart:developer';
 
+import 'package:twit_clone/widgets/helpers.dart';
+
 part 'auth_event.dart';
 part 'auth_state.dart';
 
@@ -25,8 +27,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       handleLogOutEvent(event, emit);
     });
 
-    on<OnGoogleAuthResquested>((event, emit) {
-      handleGoogleAuth(event, emit);
+    on<OnGoogleAuthResquested>((event, emit) async {
+      await handleGoogleAuth(event, emit);
     });
 
     on<OnUserSignedIn>((event, emit) {
@@ -42,7 +44,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
 
     on<OnLoginRequested>((event, emit) async {
-      handleLogInEvent(event, emit);
+      await handleLogInEvent(event, emit);
     });
 
     FirebaseAuth.instance.authStateChanges().listen((event) {
@@ -59,36 +61,39 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     try {
-     await authRepository.logOut();
+      await authRepository.logOut();
+
       emit(UnAuthenticatedState());
     } catch (e) {
       emit(AuthenticatedState());
     }
   }
 
-  void handleLogInEvent(
+  Future<void> handleLogInEvent(
     OnLoginRequested event,
     Emitter<AuthState> emit,
   ) async {
     emit(LoadingState());
-    // ignore: use_build_context_synchronously
     await authRepository
         .loginWithEmailandPassword(
-      context: context,
       email: event.email,
       password: event.password,
+      context: context,
     )
-        .then((_) {
+        .then((value) {
       emit(AuthenticatedState());
     }).catchError((e) {
       log(e.toString());
-      emit(UnAuthenticatedState());
-      emit(AuthFailedState(errorMessage: e.toString()));
-      log('all un authenticated states emitted');
+      try {
+        emit(LoginFailedState(errorMessage: e.toString()));
+      } catch (e) {
+        log("${e.toString()} from catch of emitter");
+      }
+      log("all are emmitted");
     });
   }
 
-  void handleGoogleAuth(
+  Future<void> handleGoogleAuth(
     OnGoogleAuthResquested event,
     Emitter<AuthState> emit,
   ) async {
@@ -103,7 +108,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       (e) {
         log(e.toString());
         emit(UnAuthenticatedState());
-        emit(AuthFailedState(errorMessage: e.toString()));
+        try {
+          emit(LoginFailedState(errorMessage: e.toString()));
+        } catch (e) {
+          log(e.toString() + "from the emitter");
+        }
         log('all un authenticated states emitted');
       },
     );
@@ -126,7 +135,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthenticatedState());
     }).catchError((e) {
       log(e.toString());
-      emit(UnAuthenticatedState());
       emit(AuthFailedState(errorMessage: e.toString()));
       log('all un authenticated states emitted');
     });
