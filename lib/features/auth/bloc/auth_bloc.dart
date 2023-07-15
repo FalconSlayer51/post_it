@@ -58,16 +58,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     OnLogOutRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(LoadingState());
-    // ignore: use_build_context_synchronously
-    await authRepository.logOut().then((_) {
-      emit(AuthenticatedState());
-    }).catchError((e) {
-      log(e.toString());
+    try {
+     await authRepository.logOut();
       emit(UnAuthenticatedState());
-      emit(AuthFailedState(errorMessage: e.toString()));
-      log('all un authenticated states emitted');
-    });
+    } catch (e) {
+      emit(AuthenticatedState());
+    }
   }
 
   void handleLogInEvent(

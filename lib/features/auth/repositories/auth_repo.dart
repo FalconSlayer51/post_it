@@ -33,7 +33,12 @@ class AuthRepository implements IAuthRepo {
 
   @override
   Future<void> logOut() async {
-    await Future.wait([auth.signOut()]);
+    try {
+      await auth.signOut();
+    } catch (e) {
+      log(e.toString());
+      throw Exception(e);
+    }
   }
 
   @override
@@ -117,7 +122,7 @@ class AuthRepository implements IAuthRepo {
           .collection('users')
           .doc(user.uid)
           .set(userData.toMap());
-    } catch (e) {
+    } on FirebaseAuthException catch (e) {
       throw Exception(e.toString());
     }
   }

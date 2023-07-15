@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:twit_clone/features/auth/bloc/auth_bloc.dart';
@@ -5,13 +7,18 @@ import 'package:twit_clone/features/auth/screens/email_auth_screen.dart';
 
 import '../../../widgets/helpers.dart';
 
-class LandingScreen extends StatelessWidget {
+class LandingScreen extends StatefulWidget {
   static Route getRoute() => MaterialPageRoute(
         builder: (context) => const LandingScreen(),
       );
 
   const LandingScreen({super.key});
 
+  @override
+  State<LandingScreen> createState() => _LandingScreenState();
+}
+
+class _LandingScreenState extends State<LandingScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
@@ -81,6 +88,7 @@ class LandingScreen extends StatelessWidget {
                         : () {
                             BlocProvider.of<AuthBloc>(context)
                                 .add(OnGoogleAuthResquested());
+                                setState(() {});
                           },
                   )
                 ],
