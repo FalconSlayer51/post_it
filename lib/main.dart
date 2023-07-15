@@ -1,4 +1,3 @@
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -26,11 +25,10 @@ import 'package:twit_clone/widgets/glowing_action_button.dart';
 Widget renderScreensToAuthChanges(AuthState state) {
   if (state is AuthenticatedState) {
     return const MyHomeScreen();
-  }else {
+  } else {
     return const LandingScreen();
   }
 }
-
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,12 +48,10 @@ Future<void> main() async {
             create: (context) => InternetBloc(),
           ),
           BlocProvider(
-            create: (context) =>
-                AuthBloc(
-                  authRepository: RepositoryProvider.of<AuthRepository>(
-                      context),
-                  context: context,
-                ),
+            create: (context) => AuthBloc(
+              authRepository: RepositoryProvider.of<AuthRepository>(context),
+              context: context,
+            ),
           ),
           BlocProvider(
             create: (context) => EmilVerificationBloc(),
@@ -82,16 +78,14 @@ class MyApp extends StatelessWidget {
               useMaterial3: true,
               textTheme: GoogleFonts.latoTextTheme(),
             ),
-            home: renderScreensToAuthChanges(state)
-        );
+            home: renderScreensToAuthChanges(state));
       },
     );
   }
 }
 
 class MyHomeScreen extends StatefulWidget {
-  static Route getRoute() =>
-      MaterialPageRoute(
+  static Route getRoute() => MaterialPageRoute(
         builder: (context) => const MyHomeScreen(),
       );
 
@@ -134,70 +128,78 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
           ),
         ),
         actions: [
-          IconButton(icon: const Icon(Icons.search_outlined), onPressed: () {}),
+          IconButton(
+            icon: const Icon(Icons.logout_outlined),
+            onPressed: () {
+              BlocProvider.of<AuthBloc>(context).add(OnLogOutRequested());
+              Navigator.pushAndRemoveUntil(
+                context,
+                LandingScreen.getRoute(),
+                (_) => false,
+              );
+            },
+          ),
           IconButton(
               icon: const Icon(Icons.notifications_outlined), onPressed: () {}),
           IconButton(icon: const Icon(Icons.person_outlined), onPressed: () {}),
         ],
       ),
-
       body: BlocListener<EmilVerificationBloc, EmilVerificationState>(
-    listener: (context, state){
-      if(state is EmailNotVerifiedState){
-        Navigator.push(
-          context,
-          EmailVerificationSceeen.getRoute(authRepository: RepositoryProvider.of<AuthRepository>(context),),
-        );
-      }
-    }
-    ,
-          child: BlocBuilder<InternetBloc, InternetState>(
-            builder: (context, state) {
-              if (state is NotConnectedState) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.wifi_off,
-                        size: 60,
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      const Text(
-                        'Internet is off please turn on clicking below button',
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      ElevatedButton(
-                        onPressed: openInternetSettings,
-                        style:
-                        ElevatedButton.styleFrom(backgroundColor: Colors.black),
-                        child: const Text(
-                          'turn on internet',
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                      )
-                    ],
+          listener: (context, state) {
+        if (state is EmailNotVerifiedState) {
+          Navigator.push(
+            context,
+            EmailVerificationSceeen.getRoute(
+              authRepository: RepositoryProvider.of<AuthRepository>(context),
+            ),
+          );
+        }
+      }, child: BlocBuilder<InternetBloc, InternetState>(
+        builder: (context, state) {
+          if (state is NotConnectedState) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.wifi_off,
+                    size: 60,
                   ),
-                );
-              }
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  const Text(
+                    'Internet is off please turn on clicking below button',
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  ElevatedButton(
+                    onPressed: openInternetSettings,
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.black),
+                    child: const Text(
+                      'turn on internet',
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            );
+          }
 
-              return ValueListenableBuilder(
-                valueListenable: pageIndex,
-                builder: (context, value, child) {
-                  return pages[value];
-                },
-              );
+          return ValueListenableBuilder(
+            valueListenable: pageIndex,
+            builder: (context, value, child) {
+              return pages[value];
             },
-          )
-      ),
+          );
+        },
+      )),
       bottomNavigationBar:
-      _BottomNavBar(onItemSelected: _onNavigationItemSelected),
+          _BottomNavBar(onItemSelected: _onNavigationItemSelected),
     );
   }
 }
@@ -328,9 +330,9 @@ class _NavigationBarItem extends StatelessWidget {
               lable,
               style: isSelected
                   ? const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-              )
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    )
                   : const TextStyle(fontSize: 11),
             ),
           ],

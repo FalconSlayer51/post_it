@@ -4,6 +4,10 @@ import 'package:twit_clone/features/auth/screens/email_auth_screen.dart';
 import '../../../widgets/helpers.dart';
 
 class LandingScreen extends StatelessWidget {
+  static Route getRoute() => MaterialPageRoute(
+        builder: (context) => const LandingScreen(),
+      );
+
   const LandingScreen({super.key});
 
   @override
@@ -50,7 +54,8 @@ class LandingScreen extends StatelessWidget {
                 color: Colors.black,
                 context: context,
                 onPressed: () {
-                  Navigator.pushAndRemoveUntil(context, EmailAuthScreen.getRoute(),(_)=>false);
+                  Navigator.pushAndRemoveUntil(
+                      context, EmailAuthScreen.getRoute(), (_) => false);
                 },
               ),
               const SizedBox(

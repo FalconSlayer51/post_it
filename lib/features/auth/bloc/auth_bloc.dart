@@ -21,6 +21,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       (event, emit) => handleSignUpEvent(event, emit),
     );
 
+    on<OnLogOutRequested>((event, emit) {
+      handleLogOutEvent(event, emit);
+    });
+
     on<OnUserSignedIn>((event, emit) {
       emit(AuthenticatedState());
     });
@@ -33,12 +37,54 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(UserNotVerifiedState());
     });
 
+    on<OnLoginRequested>((event, emit) async {
+      handleLogInEvent(event, emit);
+    });
+
     FirebaseAuth.instance.authStateChanges().listen((event) {
       if (event!.uid.isNotEmpty) {
         add(OnUserSignedIn());
       } else {
         add(OnUserNotSignedIn());
       }
+    });
+  }
+
+  void handleLogOutEvent(
+    OnLogOutRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(LoadingState());
+    // ignore: use_build_context_synchronously
+    await authRepository.logOut().then((value) {
+      emit(AuthenticatedState());
+    }).catchError((e) {
+      log(e.toString());
+      emit(UnAuthenticatedState());
+      emit(AuthFailedState(errorMessage: e.toString()));
+      log('all un authenticated states emitted');
+    });
+  }
+
+  void handleLogInEvent(
+    OnLoginRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(LoadingState());
+    // ignore: use_build_context_synchronously
+    await authRepository
+        .loginWithEmailandPassword(
+      context: context,
+      email: event.email,
+      password: event.password,
+    )
+        .then((value) {
+      emit(AuthenticatedState());
+    }).catchError((e) {
+      log(e.toString());
+      emit(UnAuthenticatedState());
+      emit(AuthFailedState(errorMessage: e.toString()));
+      log('all un authenticated states emitted');
     });
   }
 
@@ -50,6 +96,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     // ignore: use_build_context_synchronously
     await authRepository
         .signUp(
+      username: event.username,
       context: context,
       email: event.email,
       password: event.password,

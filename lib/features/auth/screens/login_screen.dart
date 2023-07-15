@@ -1,25 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:twit_clone/features/auth/bloc/auth_bloc.dart';
-import 'package:twit_clone/features/auth/screens/login_screen.dart';
-import 'package:twit_clone/main.dart';
-import 'package:twit_clone/widgets/helpers.dart';
+import 'package:twit_clone/features/auth/screens/email_auth_screen.dart';
 
-class EmailAuthScreen extends StatefulWidget {
+import '../../../main.dart';
+import '../../../widgets/helpers.dart';
+import '../bloc/auth_bloc.dart';
+
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
+
   static Route getRoute() => MaterialPageRoute(
-        builder: (context) => const EmailAuthScreen(),
+        builder: (context) => const LoginScreen(),
       );
-  const EmailAuthScreen({super.key});
 
-  @override
-  State<EmailAuthScreen> createState() => _EmailAuthScreenState();
-}
-
-class _EmailAuthScreenState extends State<EmailAuthScreen> {
-  void signUp(
-      BuildContext context, String email, String password, String username) {
+  void signIn(BuildContext context, String email, String password)  {
     BlocProvider.of<AuthBloc>(context).add(
-      OnSignUpRequested(email: email, password: password, username: username),
+      OnLoginRequested(email: email, password: password),
     );
   }
 
@@ -27,8 +23,6 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
   Widget build(BuildContext context) {
     final emailController = TextEditingController();
     final passwordController = TextEditingController();
-    final usernameController = TextEditingController();
-    final passwordController2 = TextEditingController();
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthFailedState) {
@@ -41,10 +35,7 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
         }
         if (state is AuthenticatedState) {
           Navigator.pushAndRemoveUntil(
-            context,
-            MyHomeScreen.getRoute(),
-            (_) => false,
-          );
+              context, MyHomeScreen.getRoute(), (_) => false);
         }
       },
       builder: (context, state) {
@@ -61,21 +52,6 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
                       color: Colors.black,
                       fontSize: 50,
                       fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 35,
-                ),
-                TextField(
-                  controller: usernameController,
-                  decoration: const InputDecoration(
-                    labelText: 'username',
-                    contentPadding: EdgeInsets.all(10),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(10),
-                      ),
                     ),
                   ),
                 ),
@@ -111,20 +87,6 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
                 const SizedBox(
                   height: 20,
                 ),
-                TextField(
-                  controller: passwordController2,
-                  decoration: const InputDecoration(
-                    labelText: 're-enter your password',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(10),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
                 customButton(
                   context: context,
                   child: state is LoadingState
@@ -143,23 +105,12 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
                       );
                       return;
                     }
-                    if (passwordController.text.trim() ==
-                        passwordController2.text.trim()) {
-                      signUp(
-                        context,
-                        emailController.text.trim(),
-                        passwordController.text.trim(),
-                        usernameController.text.trim(),
-                      );
-                    } else {
-                      showSnackbar(
-                        context: context,
-                        color: Colors.amber,
-                        text: 'both passwords must be same',
-                      );
-                    }
-                    emailController.text = usernameController.text =
-                        passwordController.text = passwordController2.text = '';
+                    signIn(
+                      context,
+                      emailController.text.trim(),
+                      passwordController.text.trim(),
+                    );
+                    emailController.text = passwordController.text = '';
                   },
                 ),
                 const SizedBox(
@@ -167,11 +118,11 @@ class _EmailAuthScreenState extends State<EmailAuthScreen> {
                 ),
                 GestureDetector(
                   child: const Text(
-                    'Already have an account?',
+                    'Don\'t have an account?',
                     textAlign: TextAlign.center,
                   ),
                   onTap: () {
-                    Navigator.pushReplacement(context, LoginScreen.getRoute());
+                    Navigator.pushReplacement(context, EmailAuthScreen.getRoute());
                   },
                 ),
               ],

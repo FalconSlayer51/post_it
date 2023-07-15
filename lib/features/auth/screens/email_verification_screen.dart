@@ -29,6 +29,7 @@ class _EmailVerificationSceeenState extends State<EmailVerificationSceeen> {
       if (user?.emailVerified ?? false) {
         timer.cancel();
         Navigator.pop(context, true);
+        setState(() {});
       }
     });
     super.initState();
