@@ -1,6 +1,4 @@
-import 'dart:developer';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,21 +7,18 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:open_settings/open_settings.dart';
 
 import 'package:twit_clone/colors.dart';
+import 'package:twit_clone/features/auth/bloc/auth_bloc.dart';
+import 'package:twit_clone/features/auth/bloc/emil_verification_bloc.dart';
 import 'package:twit_clone/firebase_options.dart';
-import 'package:twit_clone/repositories/auth_repo.dart';
-import 'package:twit_clone/services/auth/bloc/auth_bloc.dart';
-import 'package:twit_clone/services/auth/bloc/emil_verification_bloc.dart';
+import 'package:twit_clone/features/auth/repositories/auth_repo.dart';
 import 'package:twit_clone/services/internet_service/bloc/internet_bloc.dart';
-import 'package:twit_clone/views/acc_view.dart';
-import 'package:twit_clone/views/email_verification_screen.dart';
-import 'package:twit_clone/views/fav_view.dart';
-import 'package:twit_clone/views/home_view.dart';
-import 'package:twit_clone/views/landing_screen.dart';
-import 'package:twit_clone/views/search_view.dart';
+import 'package:twit_clone/features/tweets/screens/acc_view.dart';
+import 'package:twit_clone/features/auth/screens/email_verification_screen.dart';
+import 'package:twit_clone/features/tweets/screens/fav_view.dart';
+import 'package:twit_clone/features/tweets/screens/home_view.dart';
+import 'package:twit_clone/features/auth/screens/landing_screen.dart';
+import 'package:twit_clone/features/tweets/screens/search_view.dart';
 import 'package:twit_clone/widgets/glowing_action_button.dart';
-import 'package:twit_clone/widgets/helpers.dart';
-import 'package:twit_clone/services/auth/bloc/emil_verification_bloc.dart';
-
 //Todo
 //add user details gathering screen and update users auth profile
 //commit changes to firestore

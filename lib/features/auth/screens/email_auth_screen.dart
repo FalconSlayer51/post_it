@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:twit_clone/features/auth/bloc/auth_bloc.dart';
 import 'package:twit_clone/main.dart';
-import 'package:twit_clone/repositories/auth_repo.dart';
-import 'package:twit_clone/services/auth/bloc/auth_bloc.dart';
 import 'package:twit_clone/widgets/helpers.dart';
 
 class EmailAuthScreen extends StatefulWidget {

@@ -2,9 +2,7 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:twit_clone/repositories/auth_repo.dart';
-import 'package:twit_clone/services/auth/bloc/emil_verification_bloc.dart';
+import 'package:twit_clone/features/auth/repositories/auth_repo.dart';
 import 'package:twit_clone/widgets/helpers.dart';
 
 class EmailVerificationSceeen extends StatefulWidget {

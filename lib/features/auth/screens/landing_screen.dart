@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:twit_clone/features/auth/email_auth_screen.dart';
+import 'package:twit_clone/features/auth/screens/email_auth_screen.dart';
 
-import '../widgets/helpers.dart';
+import '../../../widgets/helpers.dart';
 
 class LandingScreen extends StatelessWidget {
   const LandingScreen({super.key});
