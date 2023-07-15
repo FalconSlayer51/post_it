@@ -25,6 +25,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       handleLogOutEvent(event, emit);
     });
 
+    on<OnGoogleAuthResquested>((event, emit) {
+      handleGoogleAuth(event, emit);
+    });
+
     on<OnUserSignedIn>((event, emit) {
       emit(AuthenticatedState());
     });
@@ -56,7 +60,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(LoadingState());
     // ignore: use_build_context_synchronously
-    await authRepository.logOut().then((value) {
+    await authRepository.logOut().then((_) {
       emit(AuthenticatedState());
     }).catchError((e) {
       log(e.toString());
@@ -78,7 +82,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       email: event.email,
       password: event.password,
     )
-        .then((value) {
+        .then((_) {
       emit(AuthenticatedState());
     }).catchError((e) {
       log(e.toString());
@@ -86,6 +90,27 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthFailedState(errorMessage: e.toString()));
       log('all un authenticated states emitted');
     });
+  }
+
+  void handleGoogleAuth(
+    OnGoogleAuthResquested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(LoadingState());
+
+    await authRepository
+        .signInWithGoogle()
+        .then(
+          (_) => emit(AuthenticatedState()),
+        )
+        .catchError(
+      (e) {
+        log(e.toString());
+        emit(UnAuthenticatedState());
+        emit(AuthFailedState(errorMessage: e.toString()));
+        log('all un authenticated states emitted');
+      },
+    );
   }
 
   void handleSignUpEvent(

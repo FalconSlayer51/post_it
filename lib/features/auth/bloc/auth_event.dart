@@ -55,3 +55,8 @@ class OnUserNotVerified extends AuthEvent {
   @override
   List<Object> get props => [];
 }
+
+class OnGoogleAuthResquested extends AuthEvent {
+  @override
+  List<Object> get props => [];
+}
